@@ -11,7 +11,7 @@ http.createServer((req, res) => {
 }).listen(port);
 
 // 2. KONFIGURASI GEMINI (Ganti teks di bawah dengan API Key Abang)
-const genAI = new GoogleGenerativeAI("AIzaSyAJqEVG6sxbwHKgF27OLiU44OUE7rim-rY");
+const genAI = new GoogleGenerativeAI(AIzaSyAJqEVG6sxbwHKgF27OLiU44OUE7rim-rY);
 
 async function startBot() {
     const { state, saveCreds } = await useMultiFileAuthState('auth_info_baileys');
