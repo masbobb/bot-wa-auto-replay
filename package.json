@@ -1,7 +1,6 @@
 {
   "name": "bot-wa",
   "version": "1.0.0",
-  "description": "WhatsApp Bot Gemini",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
