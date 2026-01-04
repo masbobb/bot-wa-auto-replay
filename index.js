@@ -1,11 +1,16 @@
 const { default: makeWASocket, useMultiFileAuthState } = require("@whiskeysockets/baileys");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 const pino = require("pino");
+
+// MASUKKAN API KEY GEMINI KAMU DI SINI
+const genAI = new GoogleGenerativeAI(AIzaSyAJqEVG6sxbwHKgF27OLiU44OUE7rim-rY);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 async function startBot() {
     const { state, saveCreds } = await useMultiFileAuthState('auth_info_baileys');
     const sock = makeWASocket({
         auth: state,
-        printQRInTerminal: true, // QR akan muncul di log Render
+        printQRInTerminal: true,
         logger: pino({ level: "silent" })
     });
 
@@ -15,14 +20,26 @@ async function startBot() {
         const msg = m.messages[0];
         if (!msg.key.fromMe && msg.message) {
             const from = msg.key.remoteJid;
-            console.log("Ada pesan masuk dari: " + from);
+            const text = msg.message.conversation || msg.message.extendedTextMessage?.text;
             
-            // Bot akan membalas otomatis apa pun pesannya
-            await sock.sendMessage(from, { text: "Halo! Ini adalah bot otomatis Masbobb. Sedang aktif!" });
+            if (!text) return;
+            console.log("Pesan masuk: " + text);
+
+            try {
+                // Minta jawaban dari Gemini
+                const result = await model.generateContent(text);
+                const response = await result.response;
+                const aiReply = response.text();
+
+                // Kirim jawaban AI ke WhatsApp
+                await sock.sendMessage(from, { text: aiReply });
+            } catch (error) {
+                console.error("Error Gemini:", error);
+            }
         }
     });
 
-    console.log("Bot sedang menunggu pesan...");
+    console.log("Bot Gemini WA aktif...");
 }
 
 startBot();
